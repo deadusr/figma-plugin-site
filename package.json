@@ -1,0 +1,41 @@
+{
+  "name": "my-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "tsc": "npm run tsc:main && npm run tsc:ui",
+    "tsc:main": "tsc --noEmit -p plugin",
+    "tsc:ui": "tsc --noEmit -p ui-src",
+    "tsc:watch": "concurrently -n widget,iframe \"npm run tsc:main -- --watch --preserveWatchOutput\" \"npm run tsc:ui -- --watch --preserveWatchOutput\"",
+    "build": "npm run build:ui && npm run build:main -- --minify",
+    "build:main": "esbuild plugin/code.ts --bundle --outfile=dist/code.js",
+    "build:ui": "npx vite build --minify esbuild --emptyOutDir=false",
+    "build:watch": "concurrently -n widget,iframe \"npm run build:main -- --watch\" \"npm run build:ui -- --watch\"",
+    "dev": "concurrently -n tsc,build,vite 'npm:tsc:watch' 'npm:build:watch' 'vite'"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.6",
+    "zustand": "^5.0.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@figma/plugin-typings": "^1.111.0",
+    "@tailwindcss/vite": "^4.1.6",
+    "@types/lodash": "^4.17.16",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "concurrently": "^9.1.2",
+    "esbuild": "^0.25.4",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "vite": "^6.3.5",
+    "vite-plugin-singlefile": "^2.2.0"
+  }
+}
