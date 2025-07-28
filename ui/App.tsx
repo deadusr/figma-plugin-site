@@ -28,7 +28,7 @@ function App() {
             <div className="group flex items-center justify-between pl-3 pr-2 h-6 ">
               <span className="text-body-medium font-strong">Inspect</span>
 
-              <button className="w-4 h-4 bg-bg-selected rounded-medium">
+              <button className="w-4 h-4 bg-bg-selected rounded-medium outline-none">
                 <Icon className="text-icon-brand" icon="codeSnippet.24" />
               </button>
             </div>
@@ -36,7 +36,7 @@ function App() {
               <span className="text-body-medium">Code
                 <span className="text-text-secondary"> Modal.jsx</span>
               </span>
-              <button className="w-4 h-4">
+              <button className="w-4 h-4 outline-none">
                 <Icon className="text-icon" icon="clipboard.small.24" />
               </button>
             </div>
@@ -56,7 +56,7 @@ function App() {
               <span className="text-body-medium">Styles
                 <span className="text-text-secondary"> main.css</span>
               </span>
-              <button className="w-4 h-4">
+              <button className="w-4 h-4 outline-none">
                 <Icon className="text-icon" icon="clipboard.small.24" />
               </button>
             </div>
@@ -113,7 +113,7 @@ function App() {
 
             <div >
               <div className="px-2 py-1">
-                <button className="flex items-center text-text-tertiary text-body-medium font-strong">
+                <button className="flex items-center text-text-tertiary text-body-medium font-strong outline-none">
                   <Icon className="text-icon-tertiary" icon="chevron.down.16" />
                   Preview Modal.zip
                 </button>
@@ -128,7 +128,7 @@ function App() {
 
 
               <div className="px-2 py-1">
-                <button className="flex items-center">
+                <button className="flex items-center outline-none">
                   <Icon className="text-icon-tertiary" icon="chevron.down.16" />
                   <div className="flex items-center gap-2 text-body-medium">
                     <Icon icon="folder.16" />
@@ -152,7 +152,7 @@ function App() {
               </div>
 
               <div className="px-2 py-1">
-                <button className="flex items-center">
+                <button className="flex items-center outline-none">
                   <Icon className="text-icon-tertiary" icon="chevron.down.16" />
                   <div className="flex items-center gap-2 text-body-medium">
                     <Icon icon="folder.16" />

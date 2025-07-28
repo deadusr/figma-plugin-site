@@ -11,7 +11,6 @@ const generateStylesFromImage = async (node: FrameNode) => {
     const classes: string[] = []
 
     const imagePaint = node.fills !== figma.mixed ? node.fills.find(el => el.type === "IMAGE") : undefined;
-    console.log(imagePaint);
     if (imagePaint && imagePaint.imageHash !== null) {
 
         const scale = imagePaint.scaleMode === "TILE" ? "" : SCALE_CLASSES[imagePaint.scaleMode];

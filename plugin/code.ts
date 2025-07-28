@@ -3,6 +3,7 @@ import { Tags, TPageChildren } from '../types/index';
 import { MessageFromPluginPayload, MessageFromPluginType, } from '../types/messagesFromPlugin'
 import { MessageToPlugin, } from '../types/messagesToPlugin'
 import generateTagFromNode, { ColorInfo, ImageInfo, TagData } from './codeGenerators/tags/index';
+import generateComponentCode from './codeGenerators/components/componentGenerator';
 
 const nodesToHtmlTagMap = new Map<string, Tags | null>();
 const expandedNodesMap = new Map<string, string[]>();
@@ -35,11 +36,12 @@ const main = async () => {
         }
     }
 
-    figma.on("selectionchange", async () => {
+    figma.on("selectionchange", async () => { // TODO think how optimize this update in UI so it wouln't run twice
         console.log(figma.currentPage.selection[0]);
-
-        sendMessageToUI("Selected.updated", { nodes: figma.currentPage.selection.map(el => el.id) })
-
+        const selectedNode = figma.currentPage.selection[0];
+        sendMessageToUI("Selected.updated", { nodes: [selectedNode.id] })
+        expandNodesToChild(selectedNode);
+        updateLayersUI();
         updateCodeUI();
     })
 
@@ -49,15 +51,19 @@ const main = async () => {
     })
 }
 
-const updateLayersUI = async () => {
-    const children = await generateLayers()
+const updateLayersUI = () => {
+    const children = generateLayers()
     sendMessageToUI("PageNode.updated", { "children": children })
 }
 
 const updateCodeUI = async () => {
     const node = figma.currentPage.selection[0];
-    if (node === null)
+    if (!node)
         return;
+
+    // if(node.type === "COMPONENT"|| node.type === "COMPONENT_SET") {
+    //     const result = await generateComponentCode(node);
+    // }
 
     const result = await generateCode(node);
     const data = {
@@ -144,7 +150,7 @@ const generateHtml = (data: TagData, insideHtml: string = ''): string => {
         ? data.children.map(el => generateHtml(el)).join('\n')
         : '';
 
-    const props = data.tagProps !== undefined ? data.tagProps.map(el => `${el.name}${el.value === true ? "" : `=${el.value}`}`).join(' ') : "";
+    const props = data.tagProps !== undefined ? data.tagProps.map(el => `${typeof el.value === "boolean" ? el.value ? el.name : "" : `${el.name}="${el.value}"`}`).join(' ') : "";
 
     const htmlStr =
         `<${data.tag} ${props ? `${props} ` : ""}class="${data.className}">${data.content ? `\n${data.content}` : ""}${insideHtml ? `\n${insideHtml}` : ""}${childsHtml ? `\n${childsHtml}` : ""}\n</${data.tag}>`;
@@ -152,13 +158,14 @@ const generateHtml = (data: TagData, insideHtml: string = ''): string => {
 }
 
 
-const generateLayers = async () => {
+const generateLayers = () => {
     let children: TPageChildren[] = [];
     const nodes = [...figma.currentPage.children].reverse();
-    const promises = nodes.map(async node => {
+    nodes.forEach(node => {
         const hasChildren = 'children' in node && node.children.length !== 0;
         const userTag = nodesToHtmlTagMap.get(node.id) || null;
-        const tag = (await generateTagFromNode(node, userTag)).initialData;
+        const tag = generateTagFromNode(node, userTag).initialData;
+        const isImage = node.isAsset && node.type === "RECTANGLE";
 
 
         children.push({
@@ -166,12 +173,13 @@ const generateLayers = async () => {
             name: node.name,
             type: node.type,
             hasChildren,
+            isImage,
             parentIds: node.parent ? [node.parent.id] : [],
             tag
         })
 
         if (hasChildren) {
-            const childrenTags = await generateChildrenTags(node.children, node.id, expandedNodesMap);
+            const childrenTags = generateChildrenTags(node.children, node.id, expandedNodesMap);
             childrenTags.forEach(child => {
                 const parentIds = node.parent ? [node.parent.id] : [];
                 child.parentIds.forEach(id => parentIds.push(id))
@@ -181,23 +189,21 @@ const generateLayers = async () => {
         }
     })
 
-
-    await Promise.all(promises);
-
     return children;
 }
 
 
-const generateChildrenTags = async (children: readonly SceneNode[], rootId: string, expandedNodesMap: Map<string, string[]>): Promise<readonly TPageChildren[]> => {
+const generateChildrenTags = (children: readonly SceneNode[], rootId: string, expandedNodesMap: Map<string, string[]>): readonly TPageChildren[] => {
     let foundChildren: TPageChildren[] = [];
     const childrenIds = expandedNodesMap.get(rootId);
 
     if (childrenIds === undefined) return [];
 
-    const promises = children.map(async node => {
+    children.forEach(node => {
         const hasChildren = 'children' in node && node.children.length !== 0;
         const userTag = nodesToHtmlTagMap.get(node.id) || null;
-        const tag = (await generateTagFromNode(node, userTag)).initialData;
+        const tag = generateTagFromNode(node, userTag).initialData;
+        const isImage = node.isAsset && node.type === "RECTANGLE";
 
         foundChildren.push({
             id: node.id,
@@ -205,11 +211,12 @@ const generateChildrenTags = async (children: readonly SceneNode[], rootId: stri
             type: node.type,
             hasChildren,
             parentIds: [rootId],
+            isImage,
             tag
         });
 
         if (hasChildren && childrenIds.includes(node.id)) {
-            const children = await generateChildrenTags(node.children, node.id, expandedNodesMap);
+            const children = generateChildrenTags(node.children, node.id, expandedNodesMap);
             children.forEach(child => {
                 const parentIds = [rootId];
                 child.parentIds.forEach(id => parentIds.push(id))
@@ -218,10 +225,6 @@ const generateChildrenTags = async (children: readonly SceneNode[], rootId: stri
             })
         }
     })
-
-
-    await Promise.all(promises);
-
     return foundChildren;
 }
 
@@ -257,6 +260,16 @@ const expandNode = (node: BaseNode) => {
 
 const collapseNode = (node: BaseNode) => {
     expandedNodesMap.delete(node.id);
+}
+
+
+const expandNodesToChild = (childNode: BaseNode) => {
+    const hasNotExpandedParent = !!childNode.parent && !expandedNodesMap.has(childNode.parent.id);
+    if (hasNotExpandedParent) {
+        expandedNodesMap.set(childNode.parent.id, childNode.parent.children.map(el => el.id));
+        expandNodesToChild(childNode.parent);
+    }
+
 }
 
 

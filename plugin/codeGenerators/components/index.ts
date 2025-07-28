@@ -1,23 +1,42 @@
 const booleans = ["true", "false"];
 
 
-export const generateProps = (variantProperties: {
-    [property: string]: string;
-}) => {
+export const generateProps = (properties: ComponentProperties) => {
+    const props = Object.keys(properties).map(key => {
+        const prop = properties[key];
+        const name = getName(key);
 
-    const props = Object.keys(variantProperties).map(key => {
-        const value = variantProperties[key];
+        switch (prop.type) {
+            case 'BOOLEAN':
+            case 'TEXT':
+                return { name, value: prop.value }
 
-        if (booleans.includes(value.toLowerCase())) {
-            const boolVal = value === "true";
-            return boolVal ? {
-                name: key,
-                value: true
-            } : null;
+            case 'VARIANT':
+                const value = (prop.value as string).toLowerCase();
+                if (booleans.includes(value)) {
+                    const boolVal = value === "true";
+                    return {
+                        name,
+                        value: boolVal
+                    };
+                }
+
+                return { name, value: `"${value}"` };
+
+
+            case 'INSTANCE_SWAP':
+                console.log("DOESNT'T WORK WITH INSTANCE SWAP")
+                return null
+
         }
 
-        return { name: key, value: `"${value}"` };
+
     })
 
     return props.filter(el => el !== null);
+}
+
+
+const getName = (figmaPropName: string) => {
+    return figmaPropName.split("#")[0];
 }

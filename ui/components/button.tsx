@@ -9,7 +9,7 @@ type Props = {
 
 const Button = ({ type = 'primary', children, className }: Props) => {
     return (
-        <button className={`px-2 py-1 text-body-medium rounded-medium ${type === "primary" ? "bg-bg-brand text-text-onbrand" : "border border-border"} ${className}`}>
+        <button className={`px-2 py-1 text-body-medium rounded-medium outline-none ${type === "primary" ? "bg-bg-brand text-text-onbrand" : "border border-border"} ${className}`}>
             {children}
         </button>
     )

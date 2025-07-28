@@ -13,7 +13,7 @@ interface MessageToPluginPayload {
     },
     "setHtmlTagToNode": {
         node: string,
-        tag: Tags
+        tag: string
     }
 
     "getCode": {

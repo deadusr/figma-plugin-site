@@ -78,7 +78,7 @@ const FONT_PROPS = [
 
 
 
-const generateTagFromNode = async (node: SceneNode, userTag: Tags | null): Promise<PartialResult<GeneratedTagType, TagData>> => {
+const generateTagFromNode = (node: SceneNode, userTag: Tags | null): PartialResult<GeneratedTagType, TagData> => {
     const filename = node.name.replace(/\s/g, '');
 
     switch (node.type) {
@@ -114,32 +114,53 @@ const generateTagFromNode = async (node: SceneNode, userTag: Tags | null): Promi
                 }
             }
 
-        case 'INSTANCE':
-            let componentName = "";
-            let props: {
-                name: string;
-                value: string | boolean;
-            }[] = [];
-            const mainComponent = await node.getMainComponentAsync();
-            if (mainComponent === null)
-                throw new Error(`Component from instance ${node.name} was not found`);
-
-            if (mainComponent !== null && mainComponent.parent !== null && mainComponent.parent.type === "COMPONENT_SET") {
-                componentName = mainComponent.parent.name;
-            } else {
-                componentName = mainComponent.name;
-            }
-
-            if (mainComponent.variantProperties !== null) {
-                props = generateProps(mainComponent.variantProperties);
-            }
-
+        case 'COMPONENT':
             return {
                 initialData: {
-                    tag: componentName,
+                    tag: 'Component',
+                    childrenDisabled: false,
+                },
+                getDeferredData: async () => {
+                    const { className, assets } = await generateStylesFromFrame(node);
+                    return {
+                        tag: userTag || 'div',
+                        className,
+                        styles: assets.styles,
+                        tagProps: [],
+                        images: [],
+                        colors: assets.colors,
+                    }
+                }
+            }
+
+        case 'INSTANCE':
+            return {
+                initialData: {
+                    tag: node.name,
                     childrenDisabled: true,
                 },
                 getDeferredData: async () => {
+                    let componentName = "";
+                    let props: {
+                        name: string;
+                        value: string | boolean;
+                    }[] = [];
+
+                    const mainComponent = await node.getMainComponentAsync();
+                    if (mainComponent === null)
+                        throw new Error(`Component from instance ${node.name} was not found`);
+
+                    if (mainComponent !== null && mainComponent.parent !== null && mainComponent.parent.type === "COMPONENT_SET") {
+                        componentName = mainComponent.parent.name;
+                    } else {
+                        componentName = mainComponent.name;
+                    }
+
+                    if (mainComponent.variantProperties !== null) {
+                        props = generateProps(node.componentProperties);
+                    }
+
+
                     return {
                         tag: componentName,
                         className: "",
@@ -264,10 +285,8 @@ const generateTagFromNode = async (node: SceneNode, userTag: Tags | null): Promi
                             let html = await node.exportAsync({ format: "SVG_STRING" });
 
                             const colors = await getIconColorVariables(node);
-                            console.log(colors);
                             if (colors.length === 1) {
                                 const color = colors[0];
-                                console.log({ color });
                                 const regex = new RegExp(color.value, 'gi');
                                 html = html.replace(regex, "currentColor");
 

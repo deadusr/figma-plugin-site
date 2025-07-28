@@ -36,7 +36,7 @@ type ReturnType = {
     };
 }
 
-const generateStylesFromFrame = async (node: FrameNode): Promise<ReturnType> => {
+const generateStylesFromFrame = async (node: FrameNode| ComponentNode| InstanceNode): Promise<ReturnType> => {
     const [, colorVariables] = await getColors(node);
     const classes: string[] = []
     const styles: string[] = [];
@@ -47,7 +47,6 @@ const generateStylesFromFrame = async (node: FrameNode): Promise<ReturnType> => 
     const absouluteChild = node.children.find(el => 'layoutPositioning' in el && el.layoutPositioning === "ABSOLUTE") !== undefined;
 
     const rotation = Math.round(-node.rotation);
-    console.log("node rotation", Math.round(node.rotation), isMinusZero(rotation) || rotation < 0);
     const transform = rotation !== 0 ? valueToTailwindValue(rotation, "rotate", "rotate") : "";
 
     classes.push(transform);
@@ -209,7 +208,7 @@ const generateStylesFromFrame = async (node: FrameNode): Promise<ReturnType> => 
 
 
 
-const getColors = async (node: FrameNode) => {
+const getColors = async (node: FrameNode| ComponentNode| InstanceNode) => {
     const colorVariables: ColorInfo[] = [];
     const colors: string[] = [];
 

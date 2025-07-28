@@ -10,7 +10,6 @@ const generateStylesFromBgImage = async (node: FrameNode, imageSrc: string) => {
     const classes: string[] = []
 
     const imagePaint = node.fills !== figma.mixed ? node.fills.find(el => el.type === "IMAGE") : undefined;
-    console.log(imagePaint);
     if (imagePaint && imagePaint.imageHash !== null) {
         const bg = `bg-[url(${imageSrc})]`
         classes.push(bg);

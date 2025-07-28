@@ -8,7 +8,7 @@ const GRADIENT_CLASSES = {
     "GRADIENT_RADIAL": "bg-radial",
 }
 
-const getBackgrounds = async (node: FrameNode | TextNode): Promise<[string, string]> => {
+const getBackgrounds = async (node: FrameNode | TextNode| ComponentNode| InstanceNode): Promise<[string, string]> => {
     if (node.fills === figma.mixed) return ['', ''];
 
     const isText = node.type === "TEXT";
@@ -42,7 +42,7 @@ const getBackgrounds = async (node: FrameNode | TextNode): Promise<[string, stri
                 }
 
                 const gradientType = GRADIENT_CLASSES[fill.type];
-                classes.push(`${gradientType} -${rotationAngle}/srgb`)
+                classes.push(`${gradientType}-${rotationAngle}/srgb`)
 
                 const colorStops = fill.gradientStops.sort((prev, next) => prev.position - next.position) as readonly ColorStop[];
 

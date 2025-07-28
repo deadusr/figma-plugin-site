@@ -6,6 +6,7 @@ export type TPageChildren = {
     type: SceneNodeType,
     parentIds: string[],
     hasChildren: boolean,
+    isImage: boolean,
 
     tag: GeneratedTagType
 }

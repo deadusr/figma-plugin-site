@@ -10,12 +10,10 @@ import { isEqual, sortBy } from 'lodash';
 import { ColorInfo, ImageInfo } from '../plugin/codeGenerators/tags'
 
 export const usePageChildrenStore = create<{ children: TPageChildren[] }>(() => ({ children: [] }))
-export const usePageSelectionStore = create<{ nodes: string[], setSelectedNodes: (nodes: string[]) => void }>((set, get) => ({
-  nodes: [],
-  setSelectedNodes: (nodes: string[]) => {
-    if (!isEqual(sortBy(nodes), sortBy(get().nodes))) {
-      set({ nodes });
-    }
+export const usePageSelectionStore = create<{ nodeId: string | null, setSelectedNode: (nodeId: string) => void }>((set) => ({
+  nodeId: null,
+  setSelectedNode: (nodeId: string) => {
+    set({ nodeId })
   }
 }))
 
@@ -51,7 +49,7 @@ export const onToggleExpandNode = (nodeId: string) => {
   parent.postMessage({ pluginMessage: message }, "*")
 }
 
-export const onSetHtmlTagToNode = (nodeId: string, tag: Tags) => {
+export const onSetHtmlTagToNode = (nodeId: string, tag: string) => {
   const message: MessageToPlugin = {
     "message": "setHtmlTagToNode",
     "value": {
@@ -82,8 +80,8 @@ onmessage = ({ data }: MessageEvent<{ pluginMessage: MessagesFromPlugin }>) => {
       break;
 
     case 'Selected.updated':
-      const { setSelectedNodes } = usePageSelectionStore.getState();
-      setSelectedNodes(value.nodes)
+      const { setSelectedNode } = usePageSelectionStore.getState();
+      setSelectedNode(value.nodes[0])
       break;
 
     case 'Code.updated':

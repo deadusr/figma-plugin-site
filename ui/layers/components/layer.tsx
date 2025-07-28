@@ -1,38 +1,86 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SceneNodeType } from "../../../types/figmaTypes";
 import Icon from "../../components/icon";
 import { TIcons } from "../../components/icon/iconsTypes";
 import LayerName from "./layerName";
 
 
+type LayerType = SceneNodeType | "IMAGE";
+
+
 type Props = {
     selected?: "parent" | "main" | "none",
     expanded?: boolean,
     expandable?: boolean,
-    type: SceneNodeType,
+    type: LayerType,
     level: number,
     lastChild?: boolean,
     name: string,
-    component?: boolean,
     tag: string,
+    scrollToView?: boolean,
+    className?: string,
     onClick: () => void,
     onToggleExpand: () => void,
     onChangeTag: (value: string) => void,
-    onGetCode: () => void,
 }
 
-const IconToType: { [value in SceneNodeType]: TIcons } = {
+const IconToType: { [value in LayerType]: TIcons } = {
+    "BOOLEAN_OPERATION": "boolean.union.16",
     "COMPONENT": "component.16",
+    "COMPONENT_SET": "componentset.16",
+    "ELLIPSE": "ellipse.16",
     "FRAME": "frame.16",
-    "RECTANGLE": "frame.16",
+    "GROUP": "group.16",
+    "INSTANCE": "instance.16",
+    "LINE": "line.16",
+    "PAGE": "page.16",
+    "POLYGON": "polygon.16",
+    "RECTANGLE": "rectangle.16",
+    "STAR": "star.16",
+    "TEXT": "text.16",
+    "VECTOR": "complex.vector.16",
+    "IMAGE": "image.16",
+
+    "CODE_BLOCK": "warning.16",
+    "CONNECTOR": "warning.16",
+    "DOCUMENT": "warning.16",
+    "EMBED": "warning.16",
+    "HIGHLIGHT": "warning.16",
+    "INTERACTIVE_SLIDE_ELEMENT": "warning.16",
+    "LINK_UNFURL": "warning.16",
+    "MEDIA": "warning.16",
+    "SECTION": "warning.16",
+    "SHAPE_WITH_TEXT": "warning.16",
+    "SLICE": "warning.16",
+    "SLIDE": "warning.16",
+    "SLIDE_GRID": "warning.16",
+    "SLIDE_ROW": "warning.16",
+    "STAMP": "warning.16",
+    "STICKY": "warning.16",
+    "TABLE": "warning.16",
+    "TABLE_CELL": "warning.16",
+    "WASHI_TAPE": "warning.16",
+    "WIDGET": "warning.16",
+
+    "TEXT_PATH": "warning.16",
+    "TRANSFORM_GROUP": "warning.16",
 }
 
 
-const Layer = ({ selected = "none", type, level, expanded, expandable, lastChild, name, component, tag, onClick, onToggleExpand, onChangeTag, onGetCode }: Props) => {
+const Layer = ({ selected = "none", type, level, expanded, expandable, lastChild, name, tag, scrollToView, className, onClick, onToggleExpand, onChangeTag }: Props) => {
     const icon = IconToType[type];
+    const ref = useRef<HTMLDivElement>(null);
 
+    const isComponentOrInstance = ["COMPONENT", "COMPONENT_SET", "INSTANCE"].includes(type);
 
     const ml = (level - 1) * 24;
+
+
+    useEffect(() => {
+        if (scrollToView && ref.current !== null) {
+            ref.current.scrollIntoView({ "block": "center", inline: "start", "behavior": "instant" });
+        }
+    }, [scrollToView, ref])
 
     const toggle = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -48,25 +96,20 @@ const Layer = ({ selected = "none", type, level, expanded, expandable, lastChild
         onClick();
     }
 
-    const getCode = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        onGetCode();
-    }
-
     return (
-        <div onClick={click} style={{ paddingLeft: `${ml}px` }} className={`group/item relative flex items-center h-5 cursor-default ${component ? "text-text-component" : "text-text"}`}>
-            {expandable
-                ? <button onClick={toggle} className="z-20 flex items-center justify-center w-3 h-5 flex-shrink-0">
-                    <Icon className='text-icon-tertiary hidden! group-hover:block!' icon="chevron.down.16" />
-                </button>
-                : <span className="w-3 h-5" />
-            }
+        <div ref={ref} onClick={click} style={{ paddingLeft: `${ml}px` }} className={`group/item relative flex items-center h-5 pr-3 cursor-default ${isComponentOrInstance ? "text-text-component" : "text-text"} ${className}`}>
+            <div className="relative">
+                <LayerName tag={tag} onChangeTag={onChangeTag} icon={icon} name={name} component={isComponentOrInstance} />
 
-            <LayerName tag={tag} onChangeTag={onChangeTag} icon={icon} name={name} component={component} />
+                {expandable
+                    ? <button onClick={toggle} className="z-20 absolute -left-2.5 top-0 bottom-0 flex items-center justify-center w-3 h-full outline-none">
+                        <Icon className='text-icon-tertiary hidden! group-hover:block!' icon="chevron.down.16" />
+                    </button>
+                    : null
+                }
+            </div>
 
-            <div className={`z-10 absolute ml-2.5 left-0 top-1 w-[calc(100%_-_0.75rem)] h-4 
+            <div className={`z-10 absolute top-1 left-0 w-full h-4 
             ${expanded ? "rounded-t-medium" : "rounded-medium"} 
             ${selected === "main" ? "bg-bg-selected group-hover/item:bg-bg-selected-hover" : selected === "parent" ? "group-hover/item:bg-bg-selected-hover" : "group-hover/item:bg-bg-hover"}
             `} />
