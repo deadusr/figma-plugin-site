@@ -76,6 +76,11 @@ onmessage = ({ data }: MessageEvent<{ pluginMessage: MessagesFromPlugin }>) => {
 
   switch (message) {
     case 'PageNode.updated':
+      const { children } = usePageChildrenStore.getState();
+
+      if (isEqual(children, value.children))
+        break;
+
       usePageChildrenStore.setState({ children: value.children })
       break;
 

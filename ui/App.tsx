@@ -17,11 +17,13 @@ function App() {
 
   const images = useMemo(() => imagesData.images.map(({ name, base64Src }) => ({ name: name, src: base64Src })), [imagesData.images])
 
+  const layers = useMemo(() => <Layers/>,[]);
+
 
   return (
     <>
       <main className="font-body text-text">
-        <Layers />
+        {layers}
 
         <section className="flex flex-col">
           <div className="border-t border-border">
@@ -32,6 +34,7 @@ function App() {
                 <Icon className="text-icon-brand" icon="codeSnippet.24" />
               </button>
             </div>
+
             <div className="h-5 pl-3 pr-2 py-1 flex justify-between items-center">
               <span className="text-body-medium">Code
                 <span className="text-text-secondary"> Modal.jsx</span>
@@ -40,16 +43,8 @@ function App() {
                 <Icon className="text-icon" icon="clipboard.small.24" />
               </button>
             </div>
-
             <div className="pl-3 pr-2 py-2">
               <Code code={html} />
-            </div>
-
-            <div className="h-5 pl-3 pr-2 py-1 flex justify-between items-center">
-              <span className="text-body-medium text-text">Components</span>
-            </div>
-            <div className="pl-3 pr-2 py-1">
-              <Instances />
             </div>
 
             <div className="h-5 pl-3 pr-2 py-1 flex justify-between items-center">
@@ -60,10 +55,25 @@ function App() {
                 <Icon className="text-icon" icon="clipboard.small.24" />
               </button>
             </div>
-
             <div className="pl-3 pr-2 py-2">
               <Code code={css} />
             </div>
+
+            <div className="group h-5 pl-3 pr-2 py-1 flex justify-between items-center relative">
+              <button onClick={() => {}} className="z-20 absolute left-0 top-0 bottom-0 flex items-center justify-center w-3 h-full outline-none">
+                <Icon className='text-icon-tertiary hidden! group-hover:block!' icon="chevron.down.16" />
+              </button>
+              <span className="text-body-medium text-text">Style configuration</span>
+            </div>
+
+            <div className="h-5 pl-3 pr-2 py-1 flex justify-between items-center">
+              <span className="text-body-medium text-text">Components</span>
+            </div>
+            <div className="pl-3 pr-2 py-1">
+              <Instances />
+            </div>
+
+
 
 
             <div className="h-5 pl-3 pr-2 py-1 flex justify-between items-center">

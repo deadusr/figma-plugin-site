@@ -5,71 +5,11 @@ import { onToggleExpandNode, onSelectNode, usePageChildrenStore, usePageSelectio
 import Layer from "./components/layer"
 
 const Layers = () => {
-    const { children } = usePageChildrenStore();
-    const { nodeId: selectedNodeId, setSelectedNode } = usePageSelectionStore();
-
-    const selectedRef = useRef(null);
-
-    const onSelect = useCallback((id: string) => {
-        setSelectedNode(id)
-        onSelectNode(id)
-    }, [setSelectedNode])
-
-
-    useEffect(() => {
-        if (selectedRef.current !== null)
-            console.log("Scrolling to selected elem...");
-
-        console.log(selectedRef)
-    }, [selectedRef])
-
-
-    const childrenToRender = useMemo(() => {
-        const toRender: JSX.Element[] = [];
-
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            const selected = selectedNodeId === child.id;
-
-            if (selected) {
-                let idx = i + 1;
-                while (children[idx] && children[idx].parentIds.includes(child.id)) {
-                    idx += 1;
-                }
-
-                const hasSelectedChilds = idx > i + 1;
-
-                const content = (
-                    <div className={`w-fit min-w-full ml-2.5 mt-[0.2rem] ${hasSelectedChilds ? "bg-bg-selected-secondary rounded-medium" : ""}`}>
-                        <LayerComponent scrollToView className="-top-[0.2rem] -mb-[0.2rem]" key={child.id} node={child} onSelect={onSelect} selected="main" />
-
-                        {hasSelectedChilds ? (
-                            children.slice(i + 1, idx).map(el => (
-                                <LayerComponent key={el.id} node={el} onSelect={onSelect} selected="parent" />
-                            ))
-                        ) : null}
-                    </div>
-                )
-
-                toRender.push(
-                    content
-                )
-
-                if (hasSelectedChilds) i = idx - 1;
-            } else {
-                toRender.push(<LayerComponent className="ml-2.5" key={child.id} node={child} onSelect={onSelect} />)
-            }
-
-        }
-
-        return toRender;
-
-
-    }, [children, selectedNodeId, onSelect]);
-
     const clearSelection = () => {
         onSelectNode(null);
     }
+
+    const containerRef = useRef<HTMLDivElement>(null);
 
     return (
         <section className="group flex flex-col">
@@ -80,43 +20,104 @@ const Layers = () => {
                 <span className="text-body-medium font-strong">Layers</span>
             </div>
 
-            <div onClick={clearSelection} className="group flex flex-col hover:[&::-webkit-scrollbar-thumb]:bg-bg-inverse/30 overflow-scroll h-[390px]">
+            <div ref={containerRef} onClick={clearSelection} className="group flex flex-col hover:[&::-webkit-scrollbar-thumb]:bg-bg-inverse/30 overflow-scroll h-[390px]">
                 <div className="w-fit min-w-full h-fit">
-                    {childrenToRender}
+                    <LayersComponent containerRef={containerRef} />
                 </div>
-
-
-
-                {/* {children.map(node => (
-                    <LayerComponent key={node.id} node={node} selectedNodes={selectedNodes} onSelect={onSelect} />
-                ))} */}
-
-
-                {/* <Layer name="Component" level={1} type="Frame" />
-                <Layer name="Component" level={1} type="Frame" />
-                <Layer name="Component" level={2} component type="Component" />
-
-                <Layer name="Frame-3" level={3} component type="Frame" />
-                <Layer name="Component" level={3} expanded lastChild type="Frame" selected="main" />
-
-                <Layer name="Frame-4" level={4} type="Frame" selected="parent" />
-                <Layer name="Frame-4" level={4} type="Frame" selected="parent" />
-                <Layer name="Last component " level={5} lastChild type="Frame" selected="parent" /> */}
             </div>
         </section>
     )
 }
+
+const LayersComponent = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement> }) => {
+    const { children } = usePageChildrenStore();
+    const store = usePageSelectionStore();
+
+    console.log('render children');
+
+    useEffect(() => {
+        console.log('children updated')
+    }, [children])
+
+
+    useEffect(() => {
+        console.log('store updated')
+    }, [store])
+
+
+
+
+    const toRender: JSX.Element[] = [];
+
+
+    const onSelect = (id: string) => {
+        store.setSelectedNode(id)
+        onSelectNode(id)
+    }
+
+    for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        const selected = store.nodeId === child.id;
+        const nextChild = children[i + 1];
+
+        const isExpanded = nextChild !== undefined && nextChild.parentIds.length > child.parentIds.length;
+
+        if (selected) {
+            let idx = i + 1;
+            while (children[idx] && children[idx].parentIds.includes(child.id)) {
+                idx += 1;
+            }
+
+            const hasSelectedChilds = idx > i + 1;
+
+            const childChildren = hasSelectedChilds ? children.slice(i + 1, idx) : [];
+
+            const content = (
+                <div className={`w-fit min-w-full ml-2.5 mt-[0.2rem] ${hasSelectedChilds ? "bg-bg-selected-secondary rounded-medium" : ""}`}>
+                    <LayerComponent containerRef={containerRef} expanded={isExpanded} className="-top-[0.2rem] -mb-[0.2rem]" key={child.id} node={child} onSelect={onSelect} selected="main" />
+
+                    {hasSelectedChilds ? (
+                        childChildren.map((el, idx) => {
+                            const nextChild = childChildren[idx + 1];
+                            const isExpanded = nextChild !== undefined && nextChild.parentIds.length > el.parentIds.length;
+                            return (
+                                <LayerComponent containerRef={containerRef} expanded={isExpanded} key={el.id} node={el} onSelect={onSelect} selected="parent" />
+                            )
+                        })
+                    ) : null}
+                </div>
+            )
+
+            toRender.push(
+                content
+            )
+
+            if (hasSelectedChilds)
+                i = idx - 1;
+
+        } else {
+            toRender.push(<LayerComponent containerRef={containerRef} expanded={isExpanded} className="ml-2.5" key={child.id} node={child} onSelect={onSelect} />)
+        }
+
+    }
+
+    return toRender;
+}
+
 
 
 type LayerComponentProps = {
     node: TPageChildren,
     selected?: "main" | "parent" | "none",
     onSelect: (id: string) => void,
-    scrollToView?: boolean,
+    expanded: boolean,
     className?: string,
+    containerRef: React.RefObject<HTMLDivElement>
 }
 
-const LayerComponent = ({ node, onSelect, selected = "none", scrollToView, className }: LayerComponentProps,) => {
+
+const LayerComponent = ({ node, onSelect, selected = "none", expanded, containerRef, className }: LayerComponentProps,) => {
+
     const onToggle = () => {
         onToggleExpandNode(node.id)
     }
@@ -135,15 +136,16 @@ const LayerComponent = ({ node, onSelect, selected = "none", scrollToView, class
         <Layer
             level={node.parentIds.length}
             expandable={node.hasChildren}
+            expanded={expanded}
             selected={selected}
             name={node.name}
             type={type}
             tag={node.tag.tag}
             className={className}
+            containerRef={containerRef}
             onClick={onClick}
             onToggleExpand={onToggle}
             onChangeTag={onChangeTag}
-            scrollToView={scrollToView}
         />
     )
 }

@@ -1,6 +1,7 @@
 export const icons = [
-    "chevron.down.16",
     "frame.16",
+    "chevron.down.16",
+    "chevron.right.16",
     "component.16",
     "componentset.16",
     "instance.16",

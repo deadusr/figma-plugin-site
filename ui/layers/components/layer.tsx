@@ -17,7 +17,7 @@ type Props = {
     lastChild?: boolean,
     name: string,
     tag: string,
-    scrollToView?: boolean,
+    containerRef: React.RefObject<HTMLDivElement>,
     className?: string,
     onClick: () => void,
     onToggleExpand: () => void,
@@ -67,20 +67,28 @@ const IconToType: { [value in LayerType]: TIcons } = {
 }
 
 
-const Layer = ({ selected = "none", type, level, expanded, expandable, lastChild, name, tag, scrollToView, className, onClick, onToggleExpand, onChangeTag }: Props) => {
+const Layer = ({ selected = "none", type, level, expanded, expandable, name, tag, containerRef, className, onClick, onToggleExpand, onChangeTag }: Props) => {
+    const ref = useRef<HTMLDivElement>(null)
     const icon = IconToType[type];
-    const ref = useRef<HTMLDivElement>(null);
-
     const isComponentOrInstance = ["COMPONENT", "COMPONENT_SET", "INSTANCE"].includes(type);
-
     const ml = (level - 1) * 24;
 
-
     useEffect(() => {
-        if (scrollToView && ref.current !== null) {
-            ref.current.scrollIntoView({ "block": "center", inline: "start", "behavior": "instant" });
+        if (ref.current !== null && containerRef.current !== null && selected === "main") {
+            const rect = ref.current.getBoundingClientRect();
+            const isInViewport = rect.top >= 0 && rect.bottom <= containerRef.current.clientHeight;
+
+            console.log({ isInViewport });
+
+            if (!isInViewport) {
+                const top = ref.current.offsetTop - (containerRef.current.clientHeight / 2);
+                containerRef.current.scroll({ top })
+            }
+
         }
-    }, [scrollToView, ref])
+
+    }, [ref, containerRef, selected])
+
 
     const toggle = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -103,18 +111,15 @@ const Layer = ({ selected = "none", type, level, expanded, expandable, lastChild
 
                 {expandable
                     ? <button onClick={toggle} className="z-20 absolute -left-2.5 top-0 bottom-0 flex items-center justify-center w-3 h-full outline-none">
-                        <Icon className='text-icon-tertiary hidden! group-hover:block!' icon="chevron.down.16" />
+                        <Icon className={`text-icon-tertiary hidden! group-hover:block! ${expanded ? "" : "-rotate-90"}`} icon={"chevron.down.16"} />
                     </button>
                     : null
                 }
             </div>
 
             <div className={`z-10 absolute top-1 left-0 w-full h-4 
-            ${expanded ? "rounded-t-medium" : "rounded-medium"} 
-            ${selected === "main" ? "bg-bg-selected group-hover/item:bg-bg-selected-hover" : selected === "parent" ? "group-hover/item:bg-bg-selected-hover" : "group-hover/item:bg-bg-hover"}
+            ${selected === "main" ? `bg-bg-selected group-hover/item:bg-bg-selected-hover ${expanded ? "rounded-t-medium" : "rounded-medium"}` : selected === "parent" ? "rounded-medium group-hover/item:bg-bg-selected-hover" : "rounded-medium group-hover/item:bg-bg-hover"}
             `} />
-
-            <div className={`${selected === "parent" ? "block" : "hidden"} ${lastChild && selected === "main" ? "rounded-b-medium" : ""} bg-bg-selected-secondary absolute ml-2.5 left-0 -top-1 w-[calc(100%_-_0.75rem)] h-5`} />
 
         </div>
 

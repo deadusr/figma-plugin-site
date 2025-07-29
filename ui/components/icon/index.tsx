@@ -22,6 +22,7 @@ import Icon16Page from "./icons/icon-16-page";
 import Icon16Text from "./icons/icon-16-text";
 import Icon16Warning from "./icons/icon-16-warning";
 import Icon16ComplexVector from "./icons/icon-16-complex-vector";
+import Icon16ChevronRight from "./icons/icon-16-chevron-right";
 
 type Props = {
     icon: TIcons,
@@ -32,6 +33,8 @@ const Icon = ({ icon, className }: Props) => {
     switch (icon) {
         case 'chevron.down.16':
             return <Icon16ChevronDown className={className} />
+        case 'chevron.right.16':
+            return <Icon16ChevronRight className={className} />
         case "frame.16":
             return <Icon16Frame className={className} />
         case 'component.16':

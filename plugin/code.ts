@@ -4,6 +4,7 @@ import { MessageFromPluginPayload, MessageFromPluginType, } from '../types/messa
 import { MessageToPlugin, } from '../types/messagesToPlugin'
 import generateTagFromNode, { ColorInfo, ImageInfo, TagData } from './codeGenerators/tags/index';
 import generateComponentCode from './codeGenerators/components/componentGenerator';
+import { RGBAToHexA } from './utils/colors';
 
 const nodesToHtmlTagMap = new Map<string, Tags | null>();
 const expandedNodesMap = new Map<string, string[]>();
@@ -64,6 +65,22 @@ const updateCodeUI = async () => {
     // if(node.type === "COMPONENT"|| node.type === "COMPONENT_SET") {
     //     const result = await generateComponentCode(node);
     // }
+
+
+    const collections = await figma.variables.getLocalVariableCollectionsAsync();
+    const variables = await figma.variables.getLocalVariablesAsync();
+    console.log({ variables, collections });
+    variables.forEach(variable => {
+        switch(variable.resolvedType) {
+            case 'COLOR':
+                const collection = collections.find(el => el.id === variable.variableCollectionId);
+                if(!collection) return;
+
+                const value = variable.valuesByMode[collection.defaultModeId] as RGBA;
+                const hex = RGBAToHexA(value);
+                console.log(variable.name, hex);
+        }
+    })
 
     const result = await generateCode(node);
     const data = {
