@@ -5,18 +5,32 @@ import { MessageToPlugin, } from '../types/messagesToPlugin'
 import generateTagFromNode, { ColorInfo, ImageInfo, TagData } from './codeGenerators/tags/index';
 import generateComponentCode from './codeGenerators/components/componentGenerator';
 import { RGBAToHexA } from './utils/colors';
+import DefaultStyleConfig from './codeGenerators/css/defaultConfig';
 
 const nodesToHtmlTagMap = new Map<string, Tags | null>();
 const expandedNodesMap = new Map<string, string[]>();
 
+export const userColors = {
+    colors: new Map<string, string>()
+}
+
+
+const colorsPallete: {
+    id: null | string
+} = {
+    id: null
+}
+
 const main = async () => {
     figma.showUI(__html__, { themeColors: true, width: 300, height: 900 });
 
+    // init 
+    sendMessageToUI('tailwindColorPalete.updated', { id: colorsPallete.id })
+    // -- init
 
     await figma.currentPage.loadAsync();
 
     updateLayersUI();
-
 
     figma.ui.onmessage = async (message: MessageToPlugin) => {
         switch (message.message) {
@@ -34,6 +48,32 @@ const main = async () => {
                 updateLayersUI()
                 break;
 
+            case 'importTailwindColors':
+                if (colorsPallete.id) return;
+                const collection = figma.variables.createVariableCollection('Tailwind colors pallete');
+                colorsPallete.id = collection.id;
+
+                [...DefaultStyleConfig.color.entries()].forEach(([value, name]) => {
+                    const rightName = name.replace('-', '/');
+                    const variable = figma.variables.createVariable(rightName, collection, "COLOR");
+                    variable.setValueForMode(collection.defaultModeId, figma.util.rgba(value));
+                })
+
+                console.log("importTailwindColors", colorsPallete.id)
+
+                sendMessageToUI('tailwindColorPalete.updated', { id: collection.id })
+                break;
+
+            case 'removeTailwindColors':
+                if (!colorsPallete.id) return;
+
+                const oldCollection = await figma.variables.getVariableCollectionByIdAsync(colorsPallete.id);
+
+                if (oldCollection === null) return;
+
+                oldCollection.remove();
+                colorsPallete.id = null;
+                sendMessageToUI('tailwindColorPalete.updated', { id: null })
         }
     }
 
@@ -69,16 +109,17 @@ const updateCodeUI = async () => {
 
     const collections = await figma.variables.getLocalVariableCollectionsAsync();
     const variables = await figma.variables.getLocalVariablesAsync();
-    console.log({ variables, collections });
+
+    userColors.colors.clear(); // reset colors
     variables.forEach(variable => {
-        switch(variable.resolvedType) {
+        switch (variable.resolvedType) {
             case 'COLOR':
                 const collection = collections.find(el => el.id === variable.variableCollectionId);
-                if(!collection) return;
+                if (!collection) return;
 
                 const value = variable.valuesByMode[collection.defaultModeId] as RGBA;
                 const hex = RGBAToHexA(value);
-                console.log(variable.name, hex);
+                userColors.colors.set(hex, variable.name)
         }
     })
 
@@ -87,8 +128,18 @@ const updateCodeUI = async () => {
         html: result.html,
         assets: result.assets,
         css: result.assets.styles
-
     }
+
+
+
+    data.css = userColors.colors.size > 0 ? `@theme {
+${[...userColors.colors.entries()].map(([value, name]) => {
+        return `--color-${name}:${value}`
+    }).join(';\n')}
+}
+    ${data.css}` : data.css;
+
+
     sendMessageToUI('Code.updated', data);
 }
 

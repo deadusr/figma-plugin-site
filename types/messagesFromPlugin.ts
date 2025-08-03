@@ -1,7 +1,7 @@
 import { ColorInfo, ImageInfo } from '../plugin/codeGenerators/tags/index';
 import { TPageChildren } from './index'
 
-export const messages = ["PageNode.updated", "SceneNode.updated", "Selected.updated", 'Code.updated'] as const;
+export const messages = ["PageNode.updated", "SceneNode.updated", "Selected.updated", 'Code.updated', 'tailwindColorPalete.updated'] as const;
 export type MessageFromPluginType = typeof messages[number];
 
 export interface MessageFromPluginPayload {
@@ -21,6 +21,10 @@ export interface MessageFromPluginPayload {
             colors: ColorInfo[]
         }
     };
+
+    "tailwindColorPalete.updated": {
+        id: string | null
+    }
 }
 
 export type MessagesFromPlugin = {

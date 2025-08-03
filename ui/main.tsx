@@ -6,7 +6,7 @@ import App from './App.js'
 import { create } from 'zustand'
 import { Tags, TPageChildren } from '../types'
 import { MessageToPlugin } from '../types/messagesToPlugin';
-import { isEqual, sortBy } from 'lodash';
+import { before, isEqual, sortBy } from 'lodash';
 import { ColorInfo, ImageInfo } from '../plugin/codeGenerators/tags'
 
 export const usePageChildrenStore = create<{ children: TPageChildren[] }>(() => ({ children: [] }))
@@ -20,6 +20,8 @@ export const usePageSelectionStore = create<{ nodeId: string | null, setSelected
 export const useCodeStore = create<{ html: string, css: string }>(() => ({ css: '', html: '' }))
 export const useImagesStore = create<{ images: ImageInfo[] }>(() => ({ images: [] }));
 export const useColorsStore = create<{ colors: ColorInfo[] }>(() => ({ colors: [] }));
+
+export const useConfigsStore = create<{ tailwindColorPaleteId: string | null }>(() => ({ tailwindColorPaleteId: null }))
 
 
 createRoot(document.getElementById('root')!).render(
@@ -71,6 +73,24 @@ export const onGetCode = (nodeId: string) => {
 }
 
 
+export const onImportTailwindColors = () => {
+  const message: MessageToPlugin = {
+    "message": "importTailwindColors",
+    value: null
+  }
+  parent.postMessage({ pluginMessage: message }, "*")
+}
+
+
+export const onRemoveTailwindColors = () => {
+  const message: MessageToPlugin = {
+    "message": "removeTailwindColors",
+    value: null
+  }
+  parent.postMessage({ pluginMessage: message }, "*")
+}
+
+
 onmessage = ({ data }: MessageEvent<{ pluginMessage: MessagesFromPlugin }>) => {
   const { message, value } = data.pluginMessage;
 
@@ -94,6 +114,13 @@ onmessage = ({ data }: MessageEvent<{ pluginMessage: MessagesFromPlugin }>) => {
       useCodeStore.setState({ html, css })
       useImagesStore.setState({ images: assets.images });
       useColorsStore.setState({ colors: assets.colors });
+      break;
+
+    case 'tailwindColorPalete.updated':
+      console.log('updated');
+      const { id } = value;
+      useConfigsStore.setState({ tailwindColorPaleteId: id })
+      break;
   }
 }
 

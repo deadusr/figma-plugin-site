@@ -1,3 +1,4 @@
+import { userColors } from "../../code";
 import { RGBAToHexA } from "../../utils/colors";
 
 const DefaultStyleConfig = {
@@ -104,7 +105,11 @@ export const valueToTailwindValue = (value: number | RGB, name: Key, prefix?: st
 
         case 'color':
             const hex = RGBAToHexA(value as RGB);
-            const color = DefaultStyleConfig.color.get(hex);
+            const userColor = userColors.colors.get(hex);
+            const color = userColor || DefaultStyleConfig.color.get(hex);
+
+            console.log({userColor})
+
             return prefix
                 ? color !== undefined
                     ? `${prefix}-${color}`

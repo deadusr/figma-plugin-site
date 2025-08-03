@@ -1,6 +1,6 @@
 import { Tags } from "./index";
 
-export const messages = ["selectNodes", "toggleExpandNode", "setHtmlTagToNode", "getCode"] as const;
+export const messages = ["selectNodes", "toggleExpandNode", "setHtmlTagToNode", "getCode", "importTailwindColors", "removeTailwindColors"] as const;
 export type MessageToPluginType = typeof messages[number];
 
 // 2) map each message to the type you want in `value`
@@ -19,6 +19,9 @@ interface MessageToPluginPayload {
     "getCode": {
         node: string,
     }
+
+    "importTailwindColors": null,
+    "removeTailwindColors": null
 
 }
 
