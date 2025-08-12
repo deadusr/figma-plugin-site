@@ -1,12 +1,149 @@
-# React + Vite
+# FigmaToCodePlugin
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> **Статус: В активной разработке**
 
-Currently, two official plugins are available:
+Figma-плагин для автоматической конвертации дизайнов в чистый HTML + Tailwind CSS код. Позволяет выделять элементы на странице Figma и мгновенно получать готовый к использованию код с поддержкой цветовых палитр, изображений и компонентов.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<!-- TODO: Добавить скриншоты/GIF-ы плагина -->
+<!-- ![Главный экран плагина](screenshots/main.png) -->
+<!-- ![Генерация кода](screenshots/code-generation.gif) -->
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Возможности
+
+- **Конвертация Figma → HTML/CSS** — автоматическое преобразование выбранных фреймов в семантичный HTML с Tailwind CSS классами
+- **Панель слоёв** — интерактивное дерево слоёв с возможностью разворачивания/сворачивания и выбора элементов
+- **Переназначение HTML-тегов** — возможность вручную задать нужный HTML-тег (`div`, `p`, `span`, `img`, `svg`) для каждого слоя
+- **Генерация CSS-стилей** — поддержка layout (Flexbox/Auto Layout), типографики, цветов, заливок, теней, скруглений, обводок и трансформаций
+- **Работа с изображениями** — автоматическое извлечение и экспорт изображений из дизайна (PNG base64)
+- **Палитра цветов** — сбор используемых цветов с маппингом на Tailwind-классы
+- **Tailwind Color Palette** — импорт пользовательских цветовых палитр из Figma Variables для точного соответствия дизайн-токенам
+- **Компоненты** — распознавание Figma-инстансов как повторно используемых компонентов
+- **Конфигурация стилей** — настройка генерации через интерфейс плагина
+- **Экспорт проекта** — генерация готового пакета с компонентами, стилями и ассетами
+
+---
+
+##  Скриншоты
+
+<!-- TODO: Заменить заглушки реальными скриншотами -->
+
+> Скриншоты будут добавлены позже.
+
+| Описание | Превью |
+|----------|--------|
+| Панель слоёв | <!-- ![Layers](screenshots/layers.png) --> *Скоро* |
+| Генерация кода | <!-- ![Code](screenshots/code.png) --> *Скоро* |
+| Палитра цветов | <!-- ![Colors](screenshots/colors.png) --> *Скоро* |
+| Экспорт | <!-- ![Export](screenshots/export.png) --> *Скоро* |
+
+---
+
+## Установка и запуск
+
+### Требования
+
+- [Node.js](https://nodejs.org/) v18+
+- [Figma Desktop](https://www.figma.com/downloads/)
+
+### Установка зависимостей
+
+```bash
+git clone https://github.com/deadusr/figma-plugin-site
+cd figma-plugin-site
+npm install
+```
+
+### Запуск в режиме разработки
+
+```bash
+npm run dev
+```
+
+Эта команда запускает одновременно:
+- **TypeScript-компилятор** (watch-режим для `plugin/` и `ui/`)
+- **esbuild** (watch-режим для сборки `plugin/code.ts` → `dist/code.js`)
+- **Vite** (dev-сервер для UI)
+
+### Подключение к Figma
+
+1. Откройте Figma Desktop
+2. Перейдите в **Plugins** → **Development** → **Import plugin from manifest...**
+3. Выберите файл `manifest.json` из корня проекта
+4. Плагин появится в разделе **Development** — запустите его на любой странице
+
+### Сборка продакшн-версии
+
+```bash
+npm run build
+```
+
+---
+
+## Как пользоваться
+
+1. **Запустите плагин** в Figma (меню Plugins → Development → FigmaToCodePlugin)
+2. **Панель слоёв** автоматически отобразит дерево элементов текущей страницы
+3. **Выберите элемент** — кликните на слой в панели плагина или прямо на canvas в Figma
+4. **Просмотрите код** — в секции **Inspect** появится сгенерированный HTML и CSS (Tailwind)
+5. **Настройте теги** — при необходимости выберите нужный HTML-тег через выпадающее меню у каждого слоя
+6. **Настройте стили** — в секции **Style configuration** можно подключить пользовательскую Tailwind-палитру из Figma Variables
+7. **Скопируйте код** — используйте кнопку копирования рядом с блоками кода
+8. **Экспортируйте** — в секции **Export** выберите нужные опции и скачайте готовый пакет
+
+---
+
+##  Стек технологий
+
+| Категория | Технология | Версия |
+|-----------|------------|--------|
+| UI-фреймворк | React | 19.1 |
+| Стилизация | Tailwind CSS | 4.1 |
+| State-менеджмент | Zustand | 5.0 |
+| Сборка UI | Vite + vite-plugin-singlefile | 6.3 |
+| Сборка Plugin | esbuild | 0.25 |
+| Язык | TypeScript | — |
+| Figma API | @figma/plugin-typings | 1.111 |
+| Утилиты | lodash | 4.17 |
+| Линтинг | ESLint + eslint-plugin-react | 9.25 |
+
+---
+
+## Разработка
+
+### Скрипты
+
+| Команда | Описание |
+|---------|----------|
+| `npm run dev` | Запуск в dev-режиме (tsc watch + esbuild watch + vite) |
+| `npm run build` | Продакшн-сборка (UI + Plugin) |
+| `npm run build:main` | Сборка только серверной части |
+| `npm run build:ui` | Сборка только UI |
+
+### Добавление нового CSS-генератора
+
+1. Создайте файл в `plugin/codeGenerators/css/<категория>/`
+2. Экспортируйте функцию, принимающую `SceneNode` и возвращающую CSS-строку (Tailwind-классы)
+3. Подключите генератор в `plugin/codeGenerators/tags/index.ts` внутри `generateTagFromNode()`
+
+### Добавление нового типа сообщения
+
+1. Добавьте тип сообщения в `types/messagesToPlugin.ts` или `types/messagesFromPlugin.ts`
+2. Обработайте сообщение в `plugin/code.ts` (в `onmessage`) или в `ui/main.tsx` (в `onmessage`)
+
+### Добавление нового UI-компонента
+
+1. Создайте компонент в `ui/components/`
+2. Стилизуйте компонентами Tailwind, используя дизайн-токены из `ui/index.css`
+3. Подключите в `ui/App.tsx`
+
+---
+
+##  Планы
+
+- [ ] Публикация в Figma Community
+- [ ] Поддержка генерации React-компонентов (JSX)
+- [ ] Экспорт ZIP-архива с готовым проектом
+- [ ] Подсветка синтаксиса в блоке кода
+- [ ] Копирование кода в буфер обмена
