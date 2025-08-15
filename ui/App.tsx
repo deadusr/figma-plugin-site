@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Button from "./components/button";
 import Checkbox from "./components/checkbox";
 import Code from "./components/code"
@@ -7,13 +7,43 @@ import Icon from "./components/icon"
 import Images from "./components/images";
 import Instances from "./components/instances";
 import Layers from "./layers/layers"
-import { useCodeStore, useColorsStore, useImagesStore } from "./main";
+import { useCodeStore, useColorsStore, useImagesStore, onNotify } from "./main";
 import StyleConfig from "./styleconfig";
+
+const CopyButton = ({ text, copyToClipboard }: { text: string, copyToClipboard: (text: string) => void }) => {
+  const [copied, setCopied] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const handleClick = () => {
+    copyToClipboard(text);
+    setCopied(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <button className="w-4 h-4 outline-none" onClick={handleClick}>
+      <Icon className={copied ? "text-icon-brand" : "text-icon"} icon="clipboard.small.24" />
+    </button>
+  );
+};
 
 function App() {
   const { html, css } = useCodeStore();
   const imagesData = useImagesStore();
   const colorsData = useColorsStore();
+
+  const copyToClipboard = useCallback((text: string) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    onNotify('Copied to clipboard');
+  }, []);
 
 
   const images = useMemo(() => imagesData.images.map(({ name, base64Src }) => ({ name: name, src: base64Src })), [imagesData.images])
@@ -40,9 +70,7 @@ function App() {
               <span className="text-body-medium">Code
                 <span className="text-text-secondary"> Modal.jsx</span>
               </span>
-              <button className="w-4 h-4 outline-none">
-                <Icon className="text-icon" icon="clipboard.small.24" />
-              </button>
+              <CopyButton text={html} copyToClipboard={copyToClipboard} />
             </div>
             <div className="pl-3 pr-2 py-2">
               <Code code={html} />
@@ -52,9 +80,7 @@ function App() {
               <span className="text-body-medium">Styles
                 <span className="text-text-secondary"> main.css</span>
               </span>
-              <button className="w-4 h-4 outline-none">
-                <Icon className="text-icon" icon="clipboard.small.24" />
-              </button>
+              <CopyButton text={css} copyToClipboard={copyToClipboard} />
             </div>
             <div className="pl-3 pr-2 py-2">
               <Code code={css} />

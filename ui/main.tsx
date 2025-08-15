@@ -90,6 +90,14 @@ export const onRemoveTailwindColors = () => {
   parent.postMessage({ pluginMessage: message }, "*")
 }
 
+export const onNotify = (text: string) => {
+  const message: MessageToPlugin = {
+    "message": "notify",
+    value: { message: text }
+  }
+  parent.postMessage({ pluginMessage: message }, "*")
+}
+
 
 onmessage = ({ data }: MessageEvent<{ pluginMessage: MessagesFromPlugin }>) => {
   const { message, value } = data.pluginMessage;

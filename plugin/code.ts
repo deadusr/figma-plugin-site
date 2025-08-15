@@ -74,6 +74,11 @@ const main = async () => {
                 oldCollection.remove();
                 colorsPallete.id = null;
                 sendMessageToUI('tailwindColorPalete.updated', { id: null })
+                break;
+
+            case 'notify':
+                figma.notify(message.value.message);
+                break;
         }
     }
 
