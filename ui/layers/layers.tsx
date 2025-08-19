@@ -1,4 +1,4 @@
-import { JSX, useCallback, useEffect, useMemo, useRef } from "react";
+import { JSX, useCallback, useRef } from "react";
 import { TPageChildren } from "../../types";
 import Icon from "../components/icon"
 import { onToggleExpandNode, onSelectNode, usePageChildrenStore, usePageSelectionStore, onSetHtmlTagToNode } from "../main"
@@ -33,16 +33,7 @@ const LayersComponent = ({ containerRef }: { containerRef: React.RefObject<HTMLD
     const { children } = usePageChildrenStore();
     const store = usePageSelectionStore();
 
-    console.log('render children');
 
-    useEffect(() => {
-        console.log('children updated')
-    }, [children])
-
-
-    useEffect(() => {
-        console.log('store updated')
-    }, [store])
 
 
 

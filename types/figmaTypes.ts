@@ -24,7 +24,6 @@ export const SCENE_NODES = [
     "TEXT_PATH",
     "TRANSFORM_GROUP",
     "WIDGET",
-    "MEDIA",
     "SLICE",
     "TABLE_CELL",
     "VECTOR",

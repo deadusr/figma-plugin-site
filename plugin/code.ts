@@ -1,5 +1,5 @@
 import { concat, flatten } from 'lodash';
-import { Tags, TPageChildren } from '../types/index';
+import { TAGS, Tags, TPageChildren } from '../types/index';
 import { MessageFromPluginPayload, MessageFromPluginType, } from '../types/messagesFromPlugin'
 import { MessageToPlugin, } from '../types/messagesToPlugin'
 import generateTagFromNode, { ColorInfo, ImageInfo, TagData } from './codeGenerators/tags/index';
@@ -15,7 +15,7 @@ export const userColors = {
 }
 
 
-const colorsPallete: {
+const colorsPalette: {
     id: null | string
 } = {
     id: null
@@ -25,7 +25,7 @@ const main = async () => {
     figma.showUI(__html__, { themeColors: true, width: 300, height: 900 });
 
     // init 
-    sendMessageToUI('tailwindColorPalete.updated', { id: colorsPallete.id })
+    sendMessageToUI('tailwindColorPalette.updated', { id: colorsPalette.id })
     // -- init
 
     await figma.currentPage.loadAsync();
@@ -44,14 +44,15 @@ const main = async () => {
                 break;
 
             case 'setHtmlTagToNode':
-                nodesToHtmlTagMap.set(message.value.node, message.value.tag)
+                const tagValue = (TAGS as readonly string[]).indexOf(message.value.tag) !== -1 ? message.value.tag as Tags : null;
+                nodesToHtmlTagMap.set(message.value.node, tagValue)
                 updateLayersUI()
                 break;
 
             case 'importTailwindColors':
-                if (colorsPallete.id) return;
-                const collection = figma.variables.createVariableCollection('Tailwind colors pallete');
-                colorsPallete.id = collection.id;
+                if (colorsPalette.id) return;
+                const collection = figma.variables.createVariableCollection('Tailwind colors palette');
+                colorsPalette.id = collection.id;
 
                 [...DefaultStyleConfig.color.entries()].forEach(([value, name]) => {
                     const rightName = name.replace('-', '/');
@@ -59,21 +60,19 @@ const main = async () => {
                     variable.setValueForMode(collection.defaultModeId, figma.util.rgba(value));
                 })
 
-                console.log("importTailwindColors", colorsPallete.id)
-
-                sendMessageToUI('tailwindColorPalete.updated', { id: collection.id })
+                sendMessageToUI('tailwindColorPalette.updated', { id: collection.id })
                 break;
 
             case 'removeTailwindColors':
-                if (!colorsPallete.id) return;
+                if (!colorsPalette.id) return;
 
-                const oldCollection = await figma.variables.getVariableCollectionByIdAsync(colorsPallete.id);
+                const oldCollection = await figma.variables.getVariableCollectionByIdAsync(colorsPalette.id);
 
                 if (oldCollection === null) return;
 
                 oldCollection.remove();
-                colorsPallete.id = null;
-                sendMessageToUI('tailwindColorPalete.updated', { id: null })
+                colorsPalette.id = null;
+                sendMessageToUI('tailwindColorPalette.updated', { id: null })
                 break;
 
             case 'notify':
@@ -292,7 +291,7 @@ const generateChildrenTags = (children: readonly SceneNode[], rootId: string, ex
             tag
         });
 
-        if (hasChildren && childrenIds.includes(node.id)) {
+        if (hasChildren && childrenIds.indexOf(node.id) !== -1) {
             const children = generateChildrenTags(node.children, node.id, expandedNodesMap);
             children.forEach(child => {
                 const parentIds = [rootId];

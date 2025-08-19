@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Button from "./components/button";
 import Checkbox from "./components/checkbox";
 import Code from "./components/code"
@@ -46,15 +46,13 @@ function App() {
   }, []);
 
 
-  const images = useMemo(() => imagesData.images.map(({ name, base64Src }) => ({ name: name, src: base64Src })), [imagesData.images])
-
-  const layers = useMemo(() => <Layers />, []);
+  const images = imagesData.images.map(({ name, base64Src }) => ({ name: name, src: base64Src }));
 
 
   return (
     <>
       <main className="font-body text-text">
-        {layers}
+        <Layers />
 
         <section className="flex flex-col">
           <div className="border-t border-border">
@@ -127,15 +125,15 @@ function App() {
 
             <div>
               <div className="pl-3 pr-2 py-2">
-                <Checkbox active onCLick={() => { }} name="Generate components code" />
+                <Checkbox active onClick={() => { }} name="Generate components code" />
               </div>
 
               <div className="pl-3 pr-2 py-2">
-                <Checkbox onCLick={() => { }} name="Generate color pallet" />
+                <Checkbox onClick={() => { }} name="Generate color palette" />
               </div>
 
               <div className="pl-3 pr-2 py-2">
-                <Checkbox onCLick={() => { }} name="Export images" />
+                <Checkbox onClick={() => { }} name="Export images" />
               </div>
             </div>
 

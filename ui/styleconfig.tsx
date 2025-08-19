@@ -8,8 +8,8 @@ const StyleConfig = () => {
 
     const [show, toggle] = useToggle();
 
-    const { tailwindColorPaleteId } = useConfigsStore()
-    const paleteCreated = tailwindColorPaleteId !== null;
+    const { tailwindColorPaletteId } = useConfigsStore()
+    const paletteCreated = tailwindColorPaletteId !== null;
 
     const onImport = () => {
         onImportTailwindColors();
@@ -36,17 +36,17 @@ const StyleConfig = () => {
             {show
                 ? <div>
                     <div className="pl-3 pr-2 py-2">
-                        <Checkbox onCLick={() => { }} name="Disable default Tailwind pallete" />
+                        <Checkbox onClick={() => { }} name="Disable default Tailwind palette" />
                     </div>
 
                     <div className="pl-3 pr-2 py-2">
-                        <Checkbox active onCLick={() => { }} name="Generate pallet from Figma variables" />
+                        <Checkbox active onClick={() => { }} name="Generate palette from Figma variables" />
                     </div>
 
                     <div className="pl-3 pr-2 py-2">
-                        {paleteCreated
-                            ? <Button onClick={onRemove} className="w-full" type='secondary-destructive' >Remove Tailwind pallete from project</Button>
-                            : <Button onClick={onImport} className="w-full" type='secondary' >Load Tailwind pallete to project</Button>
+                        {paletteCreated
+                            ? <Button onClick={onRemove} className="w-full" type='secondary-destructive' >Remove Tailwind palette from project</Button>
+                            : <Button onClick={onImport} className="w-full" type='secondary' >Load Tailwind palette to project</Button>
                         }
 
                     </div>

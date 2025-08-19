@@ -3,14 +3,14 @@ type Props = {
 }
 
 
-const Code = ({code}: Props) => {
+const Code = ({ code }: Props) => {
     const lines = code.split('\n').length;
 
     return (
         <div className="border border-border rounded-medium flex">
             <div className="text-body-medium text-text-tertiary px-1 py-2 w-[21px] select-none">
                 {Array(lines).keys().map(idx => (
-                    <span className="block">{idx + 1}</span>
+                    <span key={idx} className="block">{idx + 1}</span>
                 ))}
             </div>
 

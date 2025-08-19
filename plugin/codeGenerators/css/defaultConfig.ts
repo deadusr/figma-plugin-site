@@ -108,7 +108,6 @@ export const valueToTailwindValue = (value: number | RGB, name: Key, prefix?: st
             const userColor = userColors.colors.get(hex);
             const color = userColor || DefaultStyleConfig.color.get(hex);
 
-            console.log({userColor})
 
             return prefix
                 ? color !== undefined

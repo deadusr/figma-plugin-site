@@ -6,7 +6,7 @@ import App from './App.js'
 import { create } from 'zustand'
 import { Tags, TPageChildren } from '../types'
 import { MessageToPlugin } from '../types/messagesToPlugin';
-import { before, isEqual, sortBy } from 'lodash';
+import { isEqual } from 'lodash';
 import { ColorInfo, ImageInfo } from '../plugin/codeGenerators/tags'
 
 export const usePageChildrenStore = create<{ children: TPageChildren[] }>(() => ({ children: [] }))
@@ -21,7 +21,7 @@ export const useCodeStore = create<{ html: string, css: string }>(() => ({ css: 
 export const useImagesStore = create<{ images: ImageInfo[] }>(() => ({ images: [] }));
 export const useColorsStore = create<{ colors: ColorInfo[] }>(() => ({ colors: [] }));
 
-export const useConfigsStore = create<{ tailwindColorPaleteId: string | null }>(() => ({ tailwindColorPaleteId: null }))
+export const useConfigsStore = create<{ tailwindColorPaletteId: string | null }>(() => ({ tailwindColorPaletteId: null }))
 
 
 createRoot(document.getElementById('root')!).render(
@@ -118,10 +118,9 @@ onmessage = ({ data }: MessageEvent<{ pluginMessage: MessagesFromPlugin }>) => {
       useColorsStore.setState({ colors: assets.colors });
       break;
 
-    case 'tailwindColorPalete.updated':
-      console.log('updated');
+    case 'tailwindColorPalette.updated':
       const { id } = value;
-      useConfigsStore.setState({ tailwindColorPaleteId: id })
+      useConfigsStore.setState({ tailwindColorPaletteId: id })
       break;
   }
 }
