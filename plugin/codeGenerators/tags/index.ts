@@ -304,7 +304,7 @@ const generateTagFromNode = (node: SceneNode, userTag: Tags | null): PartialResu
             }
 
         case 'TEXT':
-            const segments = node.getStyledTextSegments(FONT_PROPS);
+            const segments = node.getStyledTextSegments([...FONT_PROPS] as any);
             if (segments.length > 1) {
 
                 return {
@@ -317,7 +317,7 @@ const generateTagFromNode = (node: SceneNode, userTag: Tags | null): PartialResu
                         const { className, assets } = await generateStylesFromTextNode(node);
 
                         const promises = segments.map(async segment => {
-                            const { className, assets } = await generateStylesFromTextSegment(segment, node);
+                            const { className, assets } = await generateStylesFromTextSegment(segment as any, node);
                             return ({
                                 tag: 'span' as Tags,
                                 tagProps: [],

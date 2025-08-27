@@ -29,6 +29,19 @@ const TEXT_DECORATION_STYLE = {
     "DOTTED": "decoration-dotted"
 }
 
+const TEXT_ALIGN_HORIZONTAL = {
+    "LEFT": "text-left",
+    "CENTER": "text-center",
+    "RIGHT": "text-right",
+    "JUSTIFIED": "text-justify"
+}
+
+const TEXT_ALIGN_VERTICAL = {
+    "TOP": "align-top",
+    "CENTER": "align-middle",
+    "BOTTOM": "align-bottom"
+}
+
 
 type TextNodeProps = {
     fontName: FontName | typeof figma.mixed,
@@ -105,6 +118,12 @@ const generateStylesFromTextNode = async (node: TextNode): Promise<ReturnType> =
     if (node.textDecorationThickness !== figma.mixed && node.textDecorationThickness !== null && node.textDecorationThickness.unit !== "AUTO") {
         const textDecorationThickness = `decoration-[${node.textDecorationThickness.value} ${UNTIS[node.textDecorationThickness.unit]}]`;
         classes.push(textDecorationThickness);
+    }
+    if (node.textAlignHorizontal) {
+        classes.push(TEXT_ALIGN_HORIZONTAL[node.textAlignHorizontal]);
+    }
+    if (node.textAlignVertical) {
+        classes.push(TEXT_ALIGN_VERTICAL[node.textAlignVertical]);
     }
 
 
