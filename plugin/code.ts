@@ -14,6 +14,10 @@ export const userColors = {
     colors: new Map<string, string>()
 }
 
+export const userStyles = {
+    styles: new Map<string, string>()
+}
+
 
 const colorsPalette: {
     id: null | string
@@ -131,19 +135,31 @@ const updateCodeUI = async () => {
         }
     })
 
+    // Collect Paint Styles (single-SOLID only)
+    const paintStyles = await figma.getLocalPaintStylesAsync();
+    userStyles.styles.clear();
+    paintStyles.forEach(style => {
+        if (style.paints.length === 1 && style.paints[0].type === 'SOLID') {
+            const fill = style.paints[0];
+            const hex = RGBAToHexA({ ...fill.color, a: fill.opacity ?? 1 });
+            userStyles.styles.set(hex, style.name);
+        }
+    });
+
     const result = await generateCode(node);
+
+    // Deduplicate colors by name (same color can appear in multiple children)
+    const uniqueColors = [...new Map(result.assets.colors.map(c => [c.name, c])).values()];
+
     const data = {
         html: result.html,
-        assets: result.assets,
+        assets: { ...result.assets, colors: uniqueColors },
         css: result.assets.styles
     }
 
-
-
-    data.css = userColors.colors.size > 0 ? `@theme {
-${[...userColors.colors.entries()].map(([value, name]) => {
-        return `--color-${name}:${value}`
-    }).join(';\n')}
+    // @theme only includes colors actually used by the selected element
+    data.css = uniqueColors.length > 0 ? `@theme {
+${uniqueColors.map(c => `--color-${c.name}:${c.value}`).join(';\n')}
 }
     ${data.css}` : data.css;
 

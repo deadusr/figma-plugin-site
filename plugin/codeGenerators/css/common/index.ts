@@ -107,7 +107,7 @@ const getBackgrounds = async (node: FrameNode | TextNode | ComponentNode | Insta
 
 
     const classesStr = classes.map(el => el.trim()).filter(el => el.length !== 0).join(' ');
-    const stylesStr = styles.filter(el => el.value !== undefined && el.value.length !== 0).map(el => `@utility ${el.name} { background-image: ${el.value}; }`).join('\n');
+    const stylesStr = styles.filter(el => el.value !== undefined && el.value.length !== 0).map(el => `@utility ${el.name} { background: ${el.value}; }`).join('\n');
     return [classesStr, stylesStr]
 }
 

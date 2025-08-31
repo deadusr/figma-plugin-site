@@ -21,7 +21,8 @@ export type ImageInfo = {
 
 export type ColorInfo = {
     value: string,
-    name: string
+    name: string,
+    source: 'variable' | 'style'
 }
 
 type BaseData = {
@@ -385,21 +386,25 @@ const generateTagFromNode = (node: SceneNode, userTag: Tags | null): PartialResu
 }
 
 
+const resolveColorVariable = async (variableAlias: VariableAlias, node: SceneNode): Promise<ColorInfo | null> => {
+    const color = await figma.variables.getVariableByIdAsync(variableAlias.id);
+    if (color !== null && color.resolvedType === "COLOR") {
+        const value = color.resolveForConsumer(node).value as RGB | RGBA;
+        const hex = RGBAToHexA(value);
+        return { name: color.name, value: hex, source: 'variable' };
+    }
+    return null;
+}
+
 const getColorVariables = async (node: SceneNode) => {
     const colors: ColorInfo[] = [];
 
     if (node.boundVariables !== undefined) {
-
         const fills = concat(node.boundVariables.fills || [], node.boundVariables.textRangeFills || []);
-
         const promises = fills.map(async variable => {
-            const color = await figma.variables.getVariableByIdAsync(variable.id);
-            if (color !== null && color.resolvedType === "COLOR") {
-                const value = color.resolveForConsumer(node).value as RGB | RGBA;
-                const hex = RGBAToHexA(value);
-                colors.push({ name: color.name, value: hex });
-            }
-        })
+            const result = await resolveColorVariable(variable, node);
+            if (result) colors.push(result);
+        });
         await Promise.all(promises);
     }
 
@@ -407,36 +412,17 @@ const getColorVariables = async (node: SceneNode) => {
 }
 
 
-const getIconColorVariables = async (node: SceneNode) => {
-    const colors: ColorInfo[] = [];
-
-    if (node.type === "VECTOR" || node.type === "BOOLEAN_OPERATION" || node.type === "ELLIPSE" || node.type === "POLYGON" || node.type === "RECTANGLE") {
-
-        if (node.boundVariables !== undefined) {
-
-            const fills = concat(node.boundVariables.fills || [], node.boundVariables.textRangeFills || []);
-
-            const promises = fills.map(async variable => {
-                const color = await figma.variables.getVariableByIdAsync(variable.id);
-                if (color !== null && color.resolvedType === "COLOR") {
-                    const value = color.resolveForConsumer(node).value as RGB | RGBA;
-                    const hex = RGBAToHexA(value);
-                    colors.push({ name: color.name, value: hex });
-                }
-            })
-            await Promise.all(promises);
-
-        }
-    } else {
-        if ('children' in node) {
-            const promises = node.children.map(getIconColorVariables);
-            const childColors = flatten(await Promise.all(promises));
-            childColors.forEach(el => colors.push(el));
-        }
+const getIconColorVariables = async (node: SceneNode): Promise<ColorInfo[]> => {
+    const vectorTypes = ["VECTOR", "BOOLEAN_OPERATION", "ELLIPSE", "POLYGON", "RECTANGLE"];
+    const isVectorLike = vectorTypes.indexOf(node.type) !== -1;
+    if (isVectorLike) {
+        return getColorVariables(node);
     }
-
-    return colors;
-
+    if ('children' in node) {
+        const results = await Promise.all(node.children.map(getIconColorVariables));
+        return flatten(results);
+    }
+    return [];
 }
 
 export default generateTagFromNode;

@@ -1,4 +1,4 @@
-import { RGBAToHexA } from "../../../utils/colors";
+import { getColorsFromFills } from "../../../utils/colors";
 import { ColorInfo } from "../../tags/index";
 import { valueToTailwindValue } from "../defaultConfig";
 
@@ -36,7 +36,7 @@ type ReturnType = {
 }
 
 const generateStylesFromFrame = async (node: FrameNode | ComponentNode | InstanceNode): Promise<ReturnType> => {
-    const [, colorVariables] = await getColors(node);
+    const [, colorVariables] = await getColorsFromFills(node.fills, node, node.fillStyleId);
     const classes: string[] = []
     const styles: string[] = [];
 
@@ -203,40 +203,6 @@ const generateStylesFromFrame = async (node: FrameNode | ComponentNode | Instanc
         }
     }
 
-}
-
-
-
-const getColors = async (node: FrameNode | ComponentNode | InstanceNode) => {
-    const colorVariables: ColorInfo[] = [];
-    const colors: string[] = [];
-
-    const fills = node.fills === figma.mixed ? [] : node.fills;
-
-    const promises = fills.map(async fill => {
-        if (fill.type !== "SOLID")
-            return;
-
-        if (fill.boundVariables !== undefined && fill.boundVariables.color !== undefined) {
-            const color = await figma.variables.getVariableByIdAsync(fill.boundVariables.color.id);
-            if (color !== null && color.resolvedType === "COLOR") {
-                const value = color.resolveForConsumer(node as SceneNode).value as RGB | RGBA;
-                const hex = RGBAToHexA(value);
-                colorVariables.push({ name: color.name, value: hex });
-
-                return;
-            }
-        }
-
-        const hex = RGBAToHexA({ ...fill.color, a: fill.opacity ?? 1 });
-        colors.push(hex);
-        return;
-    })
-
-
-    await Promise.all(promises);
-
-    return [colors, colorVariables] as const;
 }
 
 

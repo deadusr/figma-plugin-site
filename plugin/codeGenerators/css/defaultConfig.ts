@@ -1,4 +1,4 @@
-import { userColors } from "../../code";
+import { userColors, userStyles } from "../../code";
 import { RGBAToHexA } from "../../utils/colors";
 
 const DefaultStyleConfig = {
@@ -109,7 +109,8 @@ export const valueToTailwindValue = (value: number | RGB | RGBA, name: Key, pref
 
             const hex = RGBAToHexA(baseValue);
             const userColor = userColors.colors.get(hex);
-            const color = userColor || DefaultStyleConfig.color.get(hex);
+            const userStyle = userStyles.styles.get(hex);
+            const color = userColor || userStyle || DefaultStyleConfig.color.get(hex);
 
             const hasOpacity = opacity !== 1;
             const opacityModifier = hasOpacity ? `/${Math.round(opacity * 100)}` : '';

@@ -1,6 +1,6 @@
 import { concat } from "lodash"
 import { ColorInfo } from "../../tags/index"
-import { RGBAToHexA } from "../../../utils/colors"
+import { getColorsFromFills } from "../../../utils/colors"
 
 const UNTIS = {
     "PIXELS": "px",
@@ -66,7 +66,7 @@ type TextSegmentProps = {
 
 
 const generateStylesFromTextSegment = async (segment: TextSegmentProps, parent: TextNode) => {
-    const [colors, colorVariables] = await getColors(segment, parent);
+    const [colors, colorVariables] = await getColorsFromFills(segment.fills, parent as SceneNode, segment.fillStyleId);
 
     const fontName = `font-[${segment.fontName.family}] `;
     const fontStyle = segment.fontName.style.toLowerCase() !== "italic" ? "" : `italic `;
@@ -94,35 +94,5 @@ const generateStylesFromTextSegment = async (segment: TextSegmentProps, parent: 
     };
 }
 
-
-const getColors = async (segment: TextSegmentProps, parent: TextNode) => {
-    const colorVariables: ColorInfo[] = [];
-    const colors: string[] = [];
-
-    const promises = segment.fills.map(async fill => {
-        if (fill.type !== "SOLID")
-            return;
-
-        if (fill.boundVariables !== undefined && fill.boundVariables.color !== undefined) {
-            const color = await figma.variables.getVariableByIdAsync(fill.boundVariables.color.id);
-            if (color !== null && color.resolvedType === "COLOR") {
-                const value = color.resolveForConsumer(parent as SceneNode).value as RGB | RGBA;
-                const hex = RGBAToHexA(value);
-                colorVariables.push({ name: color.name, value: hex });
-
-                return;
-            }
-        }
-
-        const hex = RGBAToHexA({ ...fill.color, a: fill.opacity ?? 1 });
-        colors.push(hex);
-        return;
-    })
-
-
-    await Promise.all(promises);
-
-    return [colors, colorVariables] as const;
-}
 
 export default generateStylesFromTextSegment;
