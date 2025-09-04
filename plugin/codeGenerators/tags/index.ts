@@ -95,7 +95,18 @@ const generateTagFromNode = (node: SceneNode, userTag: Tags | null): PartialResu
                     childrenDisabled: true,
                 },
                 getDeferredData: async () => {
-                    let html = await node.exportAsync({ format: "SVG_STRING" });
+                    let html: string;
+                    try {
+                        html = await node.exportAsync({ format: "SVG_STRING" });
+                    } catch (e) {
+                        console.warn(`Failed to export node "${node.name}" as SVG: ${e}`);
+                        html = `<!-- SVG export failed for "${node.name}" -->`;
+                        return {
+                            html,
+                            images: [],
+                            colors: [],
+                        }
+                    }
 
                     const colors = await getColorVariables(node);
                     if (colors.length === 1) {
@@ -283,7 +294,18 @@ const generateTagFromNode = (node: SceneNode, userTag: Tags | null): PartialResu
                             childrenDisabled: true,
                         },
                         getDeferredData: async () => {
-                            let html = await node.exportAsync({ format: "SVG_STRING" });
+                            let html: string;
+                            try {
+                                html = await node.exportAsync({ format: "SVG_STRING" });
+                            } catch (e) {
+                                console.warn(`Failed to export icon node "${node.name}" as SVG: ${e}`);
+                                html = `<!-- SVG export failed for "${node.name}" -->`;
+                                return {
+                                    html,
+                                    images: [],
+                                    colors: [],
+                                }
+                            }
 
                             const colors = await getIconColorVariables(node);
                             if (colors.length === 1) {
