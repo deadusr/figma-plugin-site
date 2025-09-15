@@ -1,7 +1,5 @@
-const generateComponentCode = (node: ComponentNode | ComponentSetNode) => {
-
-    console.log('generateComponentCode', node);
-
+const generateComponentCode = (_node: ComponentNode | ComponentSetNode) => {
+    // TODO: implement component code generation
 }
 
 export default generateComponentCode;

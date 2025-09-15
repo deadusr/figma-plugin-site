@@ -25,7 +25,6 @@ export const generateProps = (properties: ComponentProperties) => {
 
 
             case 'INSTANCE_SWAP':
-                console.log("DOESNT'T WORK WITH INSTANCE SWAP")
                 return null
 
         }

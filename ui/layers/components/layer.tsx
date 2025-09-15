@@ -78,8 +78,6 @@ const Layer = ({ selected = "none", type, level, expanded, expandable, name, tag
             const rect = ref.current.getBoundingClientRect();
             const isInViewport = rect.top >= 0 && rect.bottom <= containerRef.current.clientHeight;
 
-            console.log({ isInViewport });
-
             if (!isInViewport) {
                 const top = ref.current.offsetTop - (containerRef.current.clientHeight / 2);
                 containerRef.current.scroll({ top })
