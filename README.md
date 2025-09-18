@@ -1,53 +1,53 @@
 # FigmaToCodePlugin
 
-> **Статус: В активной разработке**
+> **Status: In active development**
 
-Figma-плагин для автоматической конвертации дизайнов в чистый HTML + Tailwind CSS код. Позволяет выделять элементы на странице Figma и мгновенно получать готовый к использованию код с поддержкой цветовых палитр, изображений и компонентов.
+A Figma plugin for automatic conversion of designs into clean HTML + Tailwind CSS code. Select elements on a Figma page and instantly get production-ready code with support for color palettes, images, and components.
 
-<!-- TODO: Добавить скриншоты/GIF-ы плагина -->
-<!-- ![Главный экран плагина](screenshots/main.png) -->
-<!-- ![Генерация кода](screenshots/code-generation.gif) -->
-
----
-
-## Возможности
-
-- **Конвертация Figma → HTML/CSS** — автоматическое преобразование выбранных фреймов в семантичный HTML с Tailwind CSS классами
-- **Панель слоёв** — интерактивное дерево слоёв с возможностью разворачивания/сворачивания и выбора элементов
-- **Переназначение HTML-тегов** — возможность вручную задать нужный HTML-тег (`div`, `p`, `span`, `img`, `svg`) для каждого слоя
-- **Генерация CSS-стилей** — поддержка layout (Flexbox/Auto Layout), типографики, цветов, заливок, теней, скруглений, обводок и трансформаций
-- **Работа с изображениями** — автоматическое извлечение и экспорт изображений из дизайна (PNG base64)
-- **Палитра цветов** — сбор используемых цветов с маппингом на Tailwind-классы
-- **Tailwind Color Palette** — импорт пользовательских цветовых палитр из Figma Variables для точного соответствия дизайн-токенам
-- **Компоненты** — распознавание Figma-инстансов как повторно используемых компонентов
-- **Конфигурация стилей** — настройка генерации через интерфейс плагина
-- **Экспорт проекта** — генерация готового пакета с компонентами, стилями и ассетами
+<!-- TODO: Add screenshots/GIFs of the plugin -->
+<!-- ![Main screen](screenshots/main.png) -->
+<!-- ![Code generation](screenshots/code-generation.gif) -->
 
 ---
 
-##  Скриншоты
+## Features
 
-<!-- TODO: Заменить заглушки реальными скриншотами -->
-
-> Скриншоты будут добавлены позже.
-
-| Описание | Превью |
-|----------|--------|
-| Панель слоёв | <!-- ![Layers](screenshots/layers.png) --> *Скоро* |
-| Генерация кода | <!-- ![Code](screenshots/code.png) --> *Скоро* |
-| Палитра цветов | <!-- ![Colors](screenshots/colors.png) --> *Скоро* |
-| Экспорт | <!-- ![Export](screenshots/export.png) --> *Скоро* |
+- **Figma → HTML/CSS conversion** — automatic transformation of selected frames into semantic HTML with Tailwind CSS classes
+- **Layers panel** — interactive layer tree with expand/collapse and element selection
+- **HTML tag reassignment** — manually set the desired HTML tag (`div`, `p`, `span`, `img`, `svg`) for each layer
+- **CSS styles generation** — supports layout (Flexbox/Auto Layout), typography, colors, fills, shadows, border-radius, strokes, and transforms
+- **Image handling** — automatic extraction and export of images from designs (PNG base64)
+- **Color palette** — collects used colors with Tailwind class mapping
+- **Tailwind Color Palette** — imports custom color palettes from Figma Variables for precise design-token matching
+- **Components** — recognizes Figma instances as reusable components
+- **Style configuration** — configure generation through the plugin interface
+- **Project export** — generates a ready-made package with components, styles, and assets
 
 ---
 
-## Установка и запуск
+## Screenshots
 
-### Требования
+<!-- TODO: Replace placeholders with real screenshots -->
+
+> Screenshots will be added soon.
+
+| Description | Preview |
+|-------------|---------|
+| Layers panel | <!-- ![Layers](screenshots/layers.png) --> *Coming soon* |
+| Code generation | <!-- ![Code](screenshots/code.png) --> *Coming soon* |
+| Color palette | <!-- ![Colors](screenshots/colors.png) --> *Coming soon* |
+| Export | <!-- ![Export](screenshots/export.png) --> *Coming soon* |
+
+---
+
+## Installation & Setup
+
+### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+
 - [Figma Desktop](https://www.figma.com/downloads/)
 
-### Установка зависимостей
+### Install dependencies
 
 ```bash
 git clone https://github.com/deadusr/figma-plugin-site
@@ -55,25 +55,25 @@ cd figma-plugin-site
 npm install
 ```
 
-### Запуск в режиме разработки
+### Run in development mode
 
 ```bash
 npm run dev
 ```
 
-Эта команда запускает одновременно:
-- **TypeScript-компилятор** (watch-режим для `plugin/` и `ui/`)
-- **esbuild** (watch-режим для сборки `plugin/code.ts` → `dist/code.js`)
-- **Vite** (dev-сервер для UI)
+This command starts simultaneously:
+- **TypeScript compiler** (watch mode for `plugin/` and `ui/`)
+- **esbuild** (watch mode to bundle `plugin/code.ts` → `dist/code.js`)
+- **Vite** (dev server for the UI)
 
-### Подключение к Figma
+### Connect to Figma
 
-1. Откройте Figma Desktop
-2. Перейдите в **Plugins** → **Development** → **Import plugin from manifest...**
-3. Выберите файл `manifest.json` из корня проекта
-4. Плагин появится в разделе **Development** — запустите его на любой странице
+1. Open Figma Desktop
+2. Go to **Plugins** → **Development** → **Import plugin from manifest...**
+3. Select the `manifest.json` file from the project root
+4. The plugin will appear under **Development** — run it on any page
 
-### Сборка продакшн-версии
+### Production build
 
 ```bash
 npm run build
@@ -81,69 +81,75 @@ npm run build
 
 ---
 
-## Как пользоваться
+## Usage
 
-1. **Запустите плагин** в Figma (меню Plugins → Development → FigmaToCodePlugin)
-2. **Панель слоёв** автоматически отобразит дерево элементов текущей страницы
-3. **Выберите элемент** — кликните на слой в панели плагина или прямо на canvas в Figma
-4. **Просмотрите код** — в секции **Inspect** появится сгенерированный HTML и CSS (Tailwind)
-5. **Настройте теги** — при необходимости выберите нужный HTML-тег через выпадающее меню у каждого слоя
-6. **Настройте стили** — в секции **Style configuration** можно подключить пользовательскую Tailwind-палитру из Figma Variables
-7. **Скопируйте код** — используйте кнопку копирования рядом с блоками кода
-8. **Экспортируйте** — в секции **Export** выберите нужные опции и скачайте готовый пакет
+1. **Launch the plugin** in Figma (menu Plugins → Development → FigmaToCodePlugin)
+2. **Layers panel** automatically displays the element tree of the current page
+3. **Select an element** — click a layer in the plugin panel or directly on the Figma canvas
+4. **View the code** — the **Inspect** section shows generated HTML and CSS (Tailwind)
+5. **Adjust tags** — if needed, choose the desired HTML tag via the dropdown on each layer
+6. **Configure styles** — in the **Style configuration** section, connect a custom Tailwind palette from Figma Variables
+7. **Copy code** — use the copy button next to code blocks
+8. **Export** — in the **Export** section, select the desired options and download a ready-made package
 
 ---
 
-##  Стек технологий
+## Tech Stack
 
-| Категория | Технология | Версия |
-|-----------|------------|--------|
-| UI-фреймворк | React | 19.1 |
-| Стилизация | Tailwind CSS | 4.1 |
-| State-менеджмент | Zustand | 5.0 |
-| Сборка UI | Vite + vite-plugin-singlefile | 6.3 |
-| Сборка Plugin | esbuild | 0.25 |
-| Язык | TypeScript | — |
+| Category | Technology | Version |
+|----------|------------|---------|
+| UI Framework | React | 19.1 |
+| Styling | Tailwind CSS | 4.1 |
+| State Management | Zustand | 5.0 |
+| UI Bundler | Vite + vite-plugin-singlefile | 6.3 |
+| Plugin Bundler | esbuild | 0.25 |
+| Language | TypeScript | — |
 | Figma API | @figma/plugin-typings | 1.111 |
-| Утилиты | lodash | 4.17 |
-| Линтинг | ESLint + eslint-plugin-react | 9.25 |
+| Utilities | lodash | 4.17 |
+| Linting | ESLint + eslint-plugin-react | 9.25 |
 
 ---
 
-## Разработка
+## Development
 
-### Скрипты
+### Scripts
 
-| Команда | Описание |
-|---------|----------|
-| `npm run dev` | Запуск в dev-режиме (tsc watch + esbuild watch + vite) |
-| `npm run build` | Продакшн-сборка (UI + Plugin) |
-| `npm run build:main` | Сборка только серверной части |
-| `npm run build:ui` | Сборка только UI |
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start in dev mode (tsc watch + esbuild watch + vite) |
+| `npm run build` | Production build (UI + Plugin) |
+| `npm run build:main` | Build plugin only |
+| `npm run build:ui` | Build UI only |
 
-### Добавление нового CSS-генератора
+### Adding a new CSS generator
 
-1. Создайте файл в `plugin/codeGenerators/css/<категория>/`
-2. Экспортируйте функцию, принимающую `SceneNode` и возвращающую CSS-строку (Tailwind-классы)
-3. Подключите генератор в `plugin/codeGenerators/tags/index.ts` внутри `generateTagFromNode()`
+1. Create a file in `plugin/codeGenerators/css/<category>/`
+2. Export a function that takes a `SceneNode` and returns a CSS string (Tailwind classes)
+3. Wire the generator into `plugin/codeGenerators/tags/index.ts` inside `generateTagFromNode()`
 
-### Добавление нового типа сообщения
+### Adding a new message type
 
-1. Добавьте тип сообщения в `types/messagesToPlugin.ts` или `types/messagesFromPlugin.ts`
-2. Обработайте сообщение в `plugin/code.ts` (в `onmessage`) или в `ui/main.tsx` (в `onmessage`)
+1. Add the message type to `types/messagesToPlugin.ts` or `types/messagesFromPlugin.ts`
+2. Handle the message in `plugin/code.ts` (`onmessage`) or `ui/main.tsx` (`onmessage`)
 
-### Добавление нового UI-компонента
+### Adding a new UI component
 
-1. Создайте компонент в `ui/components/`
-2. Стилизуйте компонентами Tailwind, используя дизайн-токены из `ui/index.css`
-3. Подключите в `ui/App.tsx`
+1. Create a component in `ui/components/`
+2. Style it with Tailwind classes using the design tokens from `ui/index.css`
+3. Import it into `ui/App.tsx`
 
 ---
 
-##  Планы
+## Roadmap
 
-- [ ] Публикация в Figma Community
-- [ ] Поддержка генерации React-компонентов (JSX)
-- [ ] Экспорт ZIP-архива с готовым проектом
-- [ ] Подсветка синтаксиса в блоке кода
-- [ ] Копирование кода в буфер обмена
+- [ ] Publish to Figma Community
+- [ ] React component generation (JSX)
+- [ ] ZIP archive export with a complete project
+- [ ] Syntax highlighting in code blocks
+- [x] Copy code to clipboard
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
