@@ -161,7 +161,7 @@ const updateCodeUI = async () => {
     data.css = uniqueColors.length > 0 ? `@theme {
 ${uniqueColors.map(c => `--color-${c.name.replace(/\//g, '-')}:${c.value}`).join(';\n')}
 }
-    ${data.css}` : data.css;
+${data.css}` : data.css;
 
 
     sendMessageToUI('Code.updated', data);
@@ -179,7 +179,7 @@ const generateCode = async (node: SceneNode): Promise<{ html: string, assets: { 
     if (generateChildren) {
         const children = await Promise.all(node.children.map(generateCode));
         const childrenHtml = children.map(el => el.html).join('\n')
-        const childrenStyles = children.map(el => el.assets.styles).join('\n');
+        const childrenStyles = children.map(el => el.assets.styles).filter(s => s.length > 0).join('\n');
         const childrenColors = flatten(children.map(el => el.assets.colors));
         const childrenImages = flatten(children.map(el => el.assets.images));
 

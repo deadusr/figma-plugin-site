@@ -20,6 +20,8 @@ export const icons = [
     "text.16",
     "warning.16",
     "complex.vector.16",
+    "expand.16",
+    "collapse.16",
 
     "codeSnippet.24",
     "clipboard.small.24",

@@ -23,6 +23,8 @@ import Icon16Text from "./icons/icon-16-text";
 import Icon16Warning from "./icons/icon-16-warning";
 import Icon16ComplexVector from "./icons/icon-16-complex-vector";
 import Icon16ChevronRight from "./icons/icon-16-chevron-right";
+import Icon16Expand from "./icons/icon-16-expand";
+import Icon16Collapse from "./icons/icon-16-collapse";
 
 type Props = {
     icon: TIcons,
@@ -73,6 +75,10 @@ const Icon = ({ icon, className }: Props) => {
             return <Icon16Warning className={className} />
         case 'complex.vector.16':
             return <Icon16ComplexVector className={className} />
+        case 'expand.16':
+            return <Icon16Expand className={className} />
+        case 'collapse.16':
+            return <Icon16Collapse className={className} />
 
         case 'codeSnippet.24':
             return <Icon24CodeSnippet className={className} />
